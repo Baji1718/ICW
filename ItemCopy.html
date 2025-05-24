@@ -1,177 +1,288 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Item List with Pagination and Search</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Item Data Management</title>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
 <style>
-    body {
-        font-family: 'Quicksand', sans-serif;
-        background-color: #F4E7E1 !important; /* Light blue background */
-        color: #333;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-    }
+  body {
+    font-family: 'Quicksand', sans-serif;
+    margin: 0;
+    background-color: #f9fafb;
+    color: #333;
+  }
 
-    .navbar {
-        background-color: #1a1a1a;
-        padding: 1rem;
-    }
+  .sidebar {
+    width: 240px;
+    background-color: #111;
+    position: fixed;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    padding-top: 20px;
+  }
+  .sidebar img.logo {
+    width: 240px;
+    margin-top: -20px;
+    height: 100px;
+  }
+  .sidebar a {
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  .sidebar a:hover {
+    background-color: #e60000;
+    border-radius: 10px;
+  }
+  .sidebar a i {
+    margin-right: 12px;
+  }
 
-    .navbar a {
-        color: white !important;
-    }
+  .container-content {
+        background-color: #F4E7E1 !important;
+    margin-left: 260px;
+    padding: 2rem 3rem 3rem 3rem;
+  }
 
-    .navbar a:hover {
-        color: #e60000 !important;
-    }
+  .card-wrapper {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem 2.5rem;
+    box-shadow: 0 4px 18px rgb(0 0 0 / 0.1);
+    max-width: 1900px;
+    margin: 0 auto;
+  }
 
-    .sidebar {
-        width: 240px;
-        background-color: #111;
-        position: fixed;
-        height: 100vh;
-        top: 0;
-        left: 0;
-        padding-top: 20px;
-    }
+  .header-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .header-wrapper h2 {
+    font-weight: 700;
+    font-size: 1.75rem;
+    color: #222;
+    margin: 0;
+  }
 
-    .sidebar img.logo {
-        width: 240px;
-        margin-top: -20px;
-        height: 180px;
-    }
+  .search-export-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+    align-items: center;
+  }
 
-    .sidebar a {
-        padding: 15px 20px;
-        display: flex;
-        align-items: center;
-        color: #fff;
-        text-decoration: none;
-        transition: all 0.3s ease;
-    }
+  .search-export-wrapper input[type="text"] {
+    flex-grow: 1;
+    min-width: 280px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: 1.5px solid #ced4da;
+    border-radius: 6px;
+    transition: border-color 0.3s ease;
+  }
+  .search-export-wrapper input[type="text"]:focus {
+    border-color: #e60000;
+    outline: none;
+    box-shadow: 0 0 5px rgba(230, 0, 0, 0.5);
+  }
+#exportBtn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+#exportBtn:hover {
+  background-color: #0056b3;
+  color: white;
+}
 
-    .sidebar a:hover {
-        background-color: #e60000;
-        border-radius: 10px;
-    }
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.5rem;
+    font-size: 0.95rem;
+    color: #444;
+  }
+  thead th {
+    text-align: center;
+    font-weight: 600;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #dee2e6;
+    color: #555;
+  }
+  tbody tr {
+    background: #fafafa;
+    transition: background-color 0.3s ease;
+    border-radius: 8px;
+  }
+  tbody tr:hover {
+    background-color: #e9f2ff;
+    cursor: pointer;
+  }
+  tbody td {
+    padding: 12px 15px;
+    text-align: center;
+    vertical-align: middle;
+  }
+  tbody td:first-child {
+    font-weight: 700;
+    color: #222;
+  }
 
-    .sidebar a i {
-        margin-right: 12px;
-    }
+  .status {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: white;
+    background-color: #79d676;
+    box-shadow: 0 0 8px rgba(40, 167, 69, 0.3);
+  }
 
+  .pagination-wrapper {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  .pagination .page-link {
+    border-radius: 6px;
+    color: #333;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+  }
+  .pagination .page-item.active .page-link {
+    background-color: #e60000;
+    color: white;
+    border-color: #e60000;
+  }
+  .pagination .page-link:hover {
+    background-color: #e60000;
+    color: white;
+    border-color: #e60000;
+  }
+
+  #loader {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  @media (max-width: 768px) {
     .container-content {
-        margin-left: 260px; /* Adjusted for sidebar */
-        padding: 2rem;
+      margin-left: 0;
+      padding: 1.5rem 1.5rem 3rem 1.5rem;
     }
-
-    .table-wrapper {
-        background-color: rgba(255, 255, 255, 0); /* Fully transparent */
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    .card-wrapper {
+      padding: 1.5rem 1.5rem;
+      margin: 0 0.5rem;
     }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        background-color: transparent;
+    .header-wrapper {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
     }
-
-    thead.table-dark {
-        background: linear-gradient(45deg, #6c757d, #495057);
-        color: #fff;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+    .search-export-wrapper {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.75rem;
     }
-
-    th, td {
-        padding: 12px 20px;
-        font-size: 14px;
-        text-align: center;
-        background-color: rgba(255, 255, 255, 0.6) !important; /* Translucent cell background */
+    .search-export-wrapper input[type="text"],
+    #exportBtn {
+      width: 100%;
+      min-width: unset;
     }
+  }
 
-    tr:hover{
-	  background-color:lightblue;
-	}
-    tbody tr:nth-child(odd) {
+  /* Hide everything except table during print */
+  @media print {
+    body * {
+      visibility: hidden !important;
     }
-
-    tbody tr:nth-child(even) {
+    #printSection, #printSection * {
+      visibility: visible !important;
     }
-
-    tbody tr:hover {
-        cursor: pointer;
+    #printSection {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
     }
-
     .pagination-wrapper {
-        display: flex;
-        justify-content: center;
-        margin-top: 20px;
+      display: none !important;
+    }
+  }
+  
+    .logo-box {
+      background-color: white;
+      padding: 20px 0;
+      border-bottom: 3px solid #A53860;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      height: 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+	  margin-top:-20px;
     }
 
-    .search-wrapper {
-        display: flex;
-        justify-content: flex-end;
-        margin-bottom: 15px;
+    .logo-text {
+      font-size: 24px;
+      font-weight: 700;
+      color: #A53860;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
     }
 
-    .form-control {
-        width: 280px;
-        font-size: 14px;
-    }
-
-    #loader {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .spinner-border {
-        width: 3rem;
-        height: 3rem;
-    }
-
-    /* Modal Styling */
-    .modal-content {
-        background-color: white !important;
-        color: #333;
-    }
-
-    .modal-body {
-        max-height: 70vh;
-        overflow-y: auto;
+    .logo-subtext {
+      font-size: 12px;
+      color: #A53860;
+      font-weight: 600;
+      margin-top: -5px;
+      letter-spacing: 0.5px;
     }
 </style>
-
 </head>
 <body>
 
 <!-- Sidebar -->
- <div class="sidebar d-none d-md-block">
-    <div class="text-center">
-      <img src="https://i.pinimg.com/736x/cc/f5/25/ccf525f979a7996723a5a7ff076fcdd7.jpg" class="logo" alt="Logo">
+<div class="sidebar d-none d-md-block">
+<div class="logo-box text-center">
+      <h4 class="logo-text">🍦 ICE CREAM</h4>	
+      <p class="logo-subtext">Inventory Management System</p>
     </div>
-    <a href="ItemCopy.html"><i class="fa-solid fa-boxes-stacked"></i> Item Data</a>
-    <a href="OrdersCopy.html"><i class="fa-solid fa-cart-plus"></i> Create Order</a>
-    <a href="OrdersListCopy.html"><i class="fa-solid fa-list-check"></i> Orders List</a>
-    <a href="Deliveries.html"><i class="fa-solid fa-truck-ramp-box"></i> Deliveries</a>
-    <a href="DeliveriesList.html"><i class="fa-solid fa-clipboard-list"></i> Deliveries List</a>
-    <a href="Inventory.html"><i class="fa-solid fa-warehouse"></i> Inventory</a>
-    <a href="AppCopy.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
-  </div>
-
+  <!-- <div class="text-center"> -->
+    <!-- <img src="https://brandpacks.com/wp-content/uploads/edd/2023/07/ice-cream-logo-template-cover.jpg" class="logo" alt="Logo" /> -->
+  <!-- </div> -->
+  <a href="Item.html"><i class="fa-solid fa-boxes-stacked"></i> Item Data</a>
+  <a href="Orders.html"><i class="fa-solid fa-cart-plus"></i> Create Order</a>
+  <a href="OrdersList.html"><i class="fa-solid fa-list-check"></i> Orders List</a>
+  <a href="Deliveries.html"><i class="fa-solid fa-truck-ramp-box"></i> Deliveries</a>
+  <a href="DeliveriesList.html"><i class="fa-solid fa-clipboard-list"></i> Deliveries List</a>
+  <a href="Inventory.html"><i class="fa-solid fa-warehouse"></i> Inventory</a>
+  <a href="AppCopy.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+</div>
 
 <!-- Loader -->
 <div id="loader">
@@ -182,46 +293,43 @@
 
 <!-- Main Content -->
 <div class="container-content">
+  <div class="card-wrapper">
+    <div class="header-wrapper">
+      <h2>Item Data Management</h2>
+      <button class="btn btn-danger"><i class="fa fa-plus me-1"></i> Add New Item</button>
+    </div>
 
-  <div class="search-wrapper">
-    <input type="text" id="searchInput" style="margin-right:40px" class="form-control" placeholder="Search by Material Name">
-  </div>
+    <div class="search-export-wrapper">
+      <input type="text" id="searchInput" placeholder="Search by Material Name" />
+      <button class="btn" id="exportBtn"><i class="fa fa-file-pdf me-1"></i> Export to PDF</button>
+    </div>
 
-  <div class="table-wrapper">
-    <table class="table" id="itemTable">
-      <thead class="table-dark">
-        <tr>
-          <th>Material Name</th>
-          <th>Description</th>
-          <th>UOM</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+    <!-- Print section wrapper -->
+    <div id="printSection">
+      <table id="itemTable" aria-label="Item list">
+        <thead>
+          <tr>
+            <th scope="col">Material Name</th>
+            <th scope="col">Description</th>
+            <th scope="col">UOM</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
 
-  <div class="pagination-wrapper">
-    <ul class="pagination pagination-sm" id="pagination"></ul>
-  </div>
-</div>
-
-<!-- Modal -->
-<div class="modal fade" id="itemModal" tabindex="-1" aria-labelledby="itemModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="itemModalLabel">Item Details</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p>Modal content goes here...</p>
-      </div>
+    <div class="pagination-wrapper">
+      <ul class="pagination pagination-sm" id="pagination"></ul>
     </div>
   </div>
 </div>
 
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", () => {
     const loader = document.getElementById("loader");
     const tableBody = document.querySelector("#itemTable tbody");
     const pagination = document.getElementById("pagination");
@@ -237,9 +345,8 @@
         materials = data;
         renderTable();
       })
-      .catch(error => {
-        console.error("Error loading data:", error);
-        tableBody.innerHTML = `<tr><td colspan="3" class="text-danger text-center">Failed to load data</td></tr>`;
+      .catch(() => {
+        tableBody.innerHTML = `<tr><td colspan="4" class="text-danger text-center">Failed to load data</td></tr>`;
       })
       .finally(() => {
         loader.style.display = "none";
@@ -251,23 +358,29 @@
     }
 
     function renderTable() {
-      const filteredMaterials = getFilteredMaterials();
+      const filtered = getFilteredMaterials();
       const start = (currentPage - 1) * rowsPerPage;
-      const paginatedItems = filteredMaterials.slice(start, start + rowsPerPage);
+      const pageItems = filtered.slice(start, start + rowsPerPage);
 
       tableBody.innerHTML = "";
-      paginatedItems.forEach(item => {
+      if (pageItems.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="4" class="text-center">No matching items found.</td></tr>`;
+        pagination.innerHTML = "";
+        return;
+      }
+
+      pageItems.forEach(item => {
         const row = `
           <tr>
-            <td>${item.MaterialName}</td>
-            <td>${item.Description}</td>
-            <td>${item.UOM}</td>
-          </tr>
-        `;
+            <td><strong>${item.MaterialName}</strong></td>
+            <td>${item.Description || '-'}</td>
+            <td>${item.UOM || '-'}</td>
+            <td><span class="status">Active</span></td>
+          </tr>`;
         tableBody.insertAdjacentHTML('beforeend', row);
       });
 
-      renderPagination(filteredMaterials.length);
+      renderPagination(filtered.length);
     }
 
     function renderPagination(totalItems) {
@@ -278,22 +391,27 @@
         const li = document.createElement("li");
         li.className = `page-item ${i === currentPage ? "active" : ""}`;
         li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-        li.addEventListener("click", (e) => {
+        li.addEventListener("click", e => {
           e.preventDefault();
+          if (currentPage === i) return;
           currentPage = i;
           renderTable();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         });
         pagination.appendChild(li);
       }
     }
 
-    searchInput.addEventListener("input", function () {
+    searchInput.addEventListener("input", () => {
       currentPage = 1;
       renderTable();
+    });
+
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      window.print();
     });
   });
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
