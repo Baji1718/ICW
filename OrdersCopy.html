@@ -121,6 +121,27 @@
       text-align: center;
       vertical-align: middle;
     }
+
+    /* Fix alignment for Quantity column */
+    thead th:nth-child(5),
+    tbody td:nth-child(5) {
+      vertical-align: middle;
+      text-align: center;
+    }
+
+    tbody td:nth-child(5) input[type="number"] {
+      margin: 0 auto;
+      display: block;
+      height: 34px;
+      box-sizing: border-box;
+      width: 80px; /* Keep your original width */
+      padding: 6px;
+      font-size: 14px;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
     .pagination-wrapper {
       margin-top: 20px;
       display: flex;
@@ -152,15 +173,6 @@
       display: none;
       align-items: center;
       justify-content: center;
-    }
-
-    input[type="number"] {
-      width: 80px;
-      padding: 6px;
-      font-size: 14px;
-      text-align: center;
-      border: 1px solid #ccc;
-      border-radius: 6px;
     }
 
     .logo-box {
@@ -232,12 +244,12 @@
     <p class="logo-subtext">Inventory Management System</p>
   </div>
   <a href="ItemCopy.html"><i class="fa-solid fa-boxes-stacked"></i> Item Data</a>
-    <a href="OrdersCopy.html"><i class="fa-solid fa-cart-plus"></i> Create Order</a>
-    <a href="OrdersListCopy.html"><i class="fa-solid fa-list-check"></i> Orders List</a>
-    <a href="DeliveriesCopy.html"><i class="fa-solid fa-truck-ramp-box"></i> Deliveries</a>
-    <a href="DeliveriesListCopy.html"><i class="fa-solid fa-clipboard-list"></i> Deliveries List</a>
-    <a href="InventoryCopy.html"><i class="fa-solid fa-warehouse"></i> Inventory</a>
-    <a href="AppCopy.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+  <a href="OrdersCopy.html"><i class="fa-solid fa-cart-plus"></i> Create Order</a>
+  <a href="OrdersListCopy.html"><i class="fa-solid fa-list-check"></i> Orders List</a>
+  <a href="DeliveriesCopy.html"><i class="fa-solid fa-truck-ramp-box"></i> Deliveries</a>
+  <a href="DeliveriesListCopy.html"><i class="fa-solid fa-clipboard-list"></i> Deliveries List</a>
+  <a href="InventoryCopy.html"><i class="fa-solid fa-warehouse"></i> Inventory</a>
+  <a href="AppCopy.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
 </div>
 
 <!-- Loader -->
