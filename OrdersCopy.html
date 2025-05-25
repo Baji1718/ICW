@@ -103,6 +103,12 @@
       padding-bottom: 0.5rem;
       border-bottom: 2px solid #dee2e6;
       color: #555;
+      vertical-align: middle;
+    }
+
+    thead th.quantity-header {
+      /* align vertically center and horizontally center */
+      text-align: center;
     }
 
     tbody tr {
@@ -122,24 +128,16 @@
       vertical-align: middle;
     }
 
-    /* Fix alignment for Quantity column */
-    thead th:nth-child(5),
-    tbody td:nth-child(5) {
-      vertical-align: middle;
-      text-align: center;
-    }
-
-    tbody td:nth-child(5) input[type="number"] {
-      margin: 0 auto;
-      display: block;
-      height: 34px;
-      box-sizing: border-box;
-      width: 80px; /* Keep your original width */
+    /* Align quantity input boxes properly */
+    input.quantity-input {
+      width: 80px;
       padding: 6px;
       font-size: 14px;
       text-align: center;
       border: 1px solid #ccc;
       border-radius: 6px;
+      margin: 0 auto; /* Center inside cell */
+      display: block;
     }
 
     .pagination-wrapper {
@@ -170,7 +168,7 @@
       width: 100vw; height: 100vh;
       background-color: rgba(0, 0, 0, 0.5);
       z-index: 9999;
-      display: none;
+      display: flex; /* Show loader by default */
       align-items: center;
       justify-content: center;
     }
@@ -279,7 +277,7 @@
             <th>Material Name</th>
             <th>Description</th>
             <th>UOM</th>
-            <th>Quantity</th>
+            <th class="quantity-header">Quantity</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -307,6 +305,8 @@
     let currentPage = 1;
     const rowsPerPage = 10;
 
+    // Loader is visible by default, so no need to show it here.
+
     fetch("https://stocknest-w3r4.onrender.com/api/materials")
       .then(res => res.json())
       .then(data => {
@@ -318,7 +318,7 @@
         itemTableBody.innerHTML = `<tr><td colspan="6" class="text-danger text-center">Failed to load data</td></tr>`;
       })
       .finally(() => {
-        loader.style.display = "none";
+        loader.style.display = "none"; // Hide loader after table rendered or error shown
       });
 
     function getFilteredMaterials() {
@@ -356,6 +356,7 @@
           const input = document.querySelector(`.quantity-input[data-index="${index}"]`);
           input.disabled = !this.checked;
           if (!this.checked) input.value = "";
+          updateSelectAllCheckbox();
         });
       });
 
@@ -373,6 +374,7 @@
           e.preventDefault();
           currentPage = i;
           renderTable();
+          selectAllCheckbox.checked = false; // reset select all on page change
         });
         pagination.appendChild(li);
       }
@@ -381,6 +383,7 @@
     searchInput.addEventListener("input", () => {
       currentPage = 1;
       renderTable();
+      selectAllCheckbox.checked = false;
     });
 
     selectAllCheckbox.addEventListener("change", function () {
@@ -392,6 +395,12 @@
         if (!this.checked) input.value = "";
       });
     });
+
+    function updateSelectAllCheckbox() {
+      const allCheckboxes = document.querySelectorAll(".item-checkbox");
+      const checkedCheckboxes = document.querySelectorAll(".item-checkbox:checked");
+      selectAllCheckbox.checked = allCheckboxes.length === checkedCheckboxes.length && allCheckboxes.length > 0;
+    }
 
     document.getElementById("saveOrders").addEventListener("click", function () {
       const saveBtn = this;
@@ -406,7 +415,8 @@
       document.querySelectorAll(".item-checkbox:checked").forEach(cb => {
         const index = cb.dataset.index;
         const item = materials[index];
-        const qty = document.querySelector(`.quantity-input[data-index="${index}"]`).value;
+        const qtyInput = document.querySelector(`.quantity-input[data-index="${index}"]`);
+        const qty = qtyInput.value;
 
         if (qty && parseInt(qty) > 0) {
           selected.push({
@@ -446,6 +456,7 @@
           input.value = "";
         });
         orderNameInput.value = "";
+        selectAllCheckbox.checked = false;
       })
       .catch(err => {
         console.error(err);
