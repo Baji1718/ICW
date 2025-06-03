@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Orders List</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Quicksand', sans-serif;
+      margin: 0;
+      background-color: #f9fafb;
+      color: #333;
+    }
+
+    .sidebar {
+      width: 240px;
+      background-color: #111;
+      position: fixed;
+      height: 100vh;
+      top: 0;
+      left: 0;
+      padding-top: 20px;
+    }
+
+    .sidebar a {
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      color: #fff;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar a:hover {
+      background-color: #e60000;
+      border-radius: 10px;
+    }
+
+    .sidebar a i {
+      margin-right: 12px;
+    }
+
+    .logo-box {
+      background-color: white;
+      padding: 20px 0;
+      border-bottom: 3px solid #A53860;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      height: 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin-top: -20px;
+    }
+
+    .logo-text {
+      font-size: 24px;
+      font-weight: 700;
+      color: #A53860;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo-subtext {
+      font-size: 12px;
+      color: #A53860;
+      font-weight: 600;
+      margin-top: -5px;
+      letter-spacing: 0.5px;
+    }
+
+    .container-content {
+      background-color: #F4E7E1 !important;
+      margin-left: 260px;
+      padding: 2rem 3rem 3rem 3rem;
+    }
+
+    .card-wrapper {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem 2.5rem;
+      box-shadow: 0 4px 18px rgb(0 0 0 / 0.1);
+      max-width: 1900px;
+      margin: 0 auto;
+    }
+
+    .header-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .header-wrapper h2 {
+      font-weight: 700;
+      font-size: 1.75rem;
+      color: #222;
+      margin: 0;
+    }
+
+    .search-export-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+      align-items: center;
+    }
+
+    .search-export-wrapper input[type="text"] {
+      flex-grow: 1;
+      min-width: 280px;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: 1.5px solid #ced4da;
+      border-radius: 6px;
+      transition: border-color 0.3s ease;
+    }
+
+    .search-export-wrapper input[type="text"]:focus {
+      border-color: #e60000;
+      outline: none;
+      box-shadow: 0 0 5px rgba(230, 0, 0, 0.5);
+    }
+
+    #exportBtn {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      transition: background-color 0.3s ease;
+    }
+
+    #exportBtn:hover {
+      background-color: #0056b3;
+      color: white;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 0.5rem;
+      font-size: 0.95rem;
+      color: #444;
+    }
+
+    thead th {
+      text-align: center;
+      font-weight: 600;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #dee2e6;
+      color: #555;
+    }
+
+    tbody tr {
+      background: #fafafa;
+      transition: background-color 0.3s ease;
+      border-radius: 8px;
+    }
+
+    tbody tr:hover {
+      background-color: #e9f2ff;
+      cursor: pointer;
+    }
+
+    tbody td {
+      padding: 12px 15px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .pagination-wrapper {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .pagination .page-link {
+      border-radius: 6px;
+      color: #333;
+      border: 1px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .pagination .page-item.active .page-link,
+    .pagination .page-link:hover {
+      background-color: #e60000;
+      color: white;
+      border-color: #e60000;
+    }
+
+    #loader {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .spinner-border {
+      width: 3rem;
+      height: 3rem;
+    }
+
+    @media (max-width: 768px) {
+      .container-content {
+        margin-left: 0;
+        padding: 1.5rem 1.5rem 3rem 1.5rem;
+      }
+
+      .card-wrapper {
+        padding: 1.5rem 1.5rem;
+        margin: 0 0.5rem;
+      }
+
+      .header-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .search-export-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+      }
+
+      .search-export-wrapper input[type="text"],
+      #exportBtn {
+        width: 100%;
+        min-width: unset;
+      }
+    }
+
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+
+      #printSection, #printSection * {
+        visibility: visible !important;
+      }
+
+      #printSection {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+
+      .pagination-wrapper {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="sidebar d-none d-md-block">
+  <div class="logo-box text-center">
+    <h4 class="logo-text">🍦 ICE CREAM</h4>
+    <p class="logo-subtext">Inventory Management System</p>
+  </div>
+  <a href="ItemCopy.html"><i class="fa-solid fa-boxes-stacked"></i> Item Data</a>
+  <a href="OrdersCopy.html"><i class="fa-solid fa-cart-plus"></i> Create Order</a>
+  <a href="OrdersListCopy.html"><i class="fa-solid fa-list-check"></i> Orders List</a>
+  <a href="DeliveriesCopy.html"><i class="fa-solid fa-truck-ramp-box"></i> Deliveries</a>
+  <a href="DeliveriesListCopy.html"><i class="fa-solid fa-clipboard-list"></i> Deliveries List</a>
+  <a href="InventoryCopy.html"><i class="fa-solid fa-warehouse"></i> Inventory</a>
+  <a href="AppCopy.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+</div>
+
+<div id="loader">
+  <div class="spinner-border text-light" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<div class="container-content">
+  <div class="card-wrapper">
+    <div class="header-wrapper">
+      <h2>Orders List</h2>
+      <button class="btn" id="exportBtn"><i class="fa fa-file-pdf me-1"></i> Export to PDF</button>
+    </div>
+
+    <div class="search-export-wrapper">
+      <input type="text" id="searchInput" placeholder="Search orders..." />
+    </div>
+
+    <div id="printSection">
+      <table id="itemTable">
+        <thead>
+          <tr>
+            <th>Order Name</th>
+            <th>Total Items</th>
+            <th>Total Quantity</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="pagination-wrapper">
+      <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="materialModal" tabindex="-1" aria-labelledby="materialModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content text-dark">
+      <div class="modal-header">
+        <h5 class="modal-title" id="materialModalLabel">Order Materials</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="modalSearchInput" class="form-control mb-3" placeholder="Search materials...">
+        <table class="table table-striped" id="modalTable">
+          <thead class="table-dark">
+            <tr>
+              <th>Material Name</th>
+              <th>Quantity</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const loader = document.getElementById("loader");
+    const searchInput = document.getElementById("searchInput");
+    const tableBody = document.querySelector("#itemTable tbody");
+    const pagination = document.getElementById("pagination");
+    const materialModal = new bootstrap.Modal(document.getElementById("materialModal"));
+    const modalTableBody = document.querySelector("#modalTable tbody");
+    const modalSearchInput = document.getElementById("modalSearchInput");
+    const exportBtn = document.getElementById("exportBtn");
+
+    let orders = [];
+    let currentPage = 1;
+    const rowsPerPage = 10;
+    let modalData = [];
+
+    function getFilteredOrders() {
+      const term = searchInput.value.toLowerCase();
+      return orders.filter(item => item.OrderName.toLowerCase().includes(term));
+    }
+
+    function renderTable() {
+      const filtered = getFilteredOrders();
+      const start = (currentPage - 1) * rowsPerPage;
+      const paginated = filtered.slice(start, start + rowsPerPage);
+
+      tableBody.innerHTML = "";
+      if (paginated.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="3" class="text-warning text-center">No results found</td></tr>`;
+        return;
+      }
+
+      paginated.forEach(item => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><a href="#" class="material-link" data-order="${item.OrderName}">${item.OrderName}</a></td>
+          <td>${item.TotalItems}</td>
+          <td>${item.TotalQuantity}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      document.querySelectorAll(".material-link").forEach(link => {
+        link.addEventListener("click", e => {
+          e.preventDefault();
+          loader.style.display = "flex";
+          const orderName = link.getAttribute("data-order");
+          fetchModalData(orderName);
+        });
+      });
+    }
+
+    function renderPagination() {
+      const totalPages = Math.ceil(getFilteredOrders().length / rowsPerPage);
+      pagination.innerHTML = "";
+      for (let i = 1; i <= totalPages; i++) {
+        const li = document.createElement("li");
+        li.className = "page-item" + (i === currentPage ? " active" : "");
+        li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+        li.querySelector("a").addEventListener("click", function (e) {
+          e.preventDefault();
+          currentPage = i;
+          renderTable();
+          renderPagination();
+        });
+        pagination.appendChild(li);
+      }
+    }
+
+    function fetchModalData(orderName) {
+      modalTableBody.innerHTML = "";
+      modalSearchInput.value = "";
+
+      fetch("https://stocknest-w3r4.onrender.com/api/order-details", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderName: orderName })
+      })
+        .then(res => res.json())
+        .then(data => {
+          modalData = data;
+          renderModalTable();
+          materialModal.show();
+          loader.style.display = "none";
+        })
+        .catch(err => {
+          modalTableBody.innerHTML = `<tr><td colspan="2" class="text-danger text-center">Failed to load materials</td></tr>`;
+          loader.style.display = "none";
+          console.error(err);
+        });
+    }
+
+    function renderModalTable() {
+      modalTableBody.innerHTML = "";
+      if (modalData.length === 0) {
+        modalTableBody.innerHTML = `<tr><td colspan="2" class="text-center">No materials found</td></tr>`;
+        return;
+      }
+
+      modalData.forEach(material => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${material.MaterialName}</td>
+          <td>${material.Quantity}</td>
+        `;
+        modalTableBody.appendChild(row);
+      });
+    }
+
+    fetch("https://stocknest-w3r4.onrender.com/api/order-summary")
+      .then(res => res.json())
+      .then(data => {
+        orders = data;
+        renderTable();
+        renderPagination();
+      })
+      .catch(err => {
+        tableBody.innerHTML = `<tr><td colspan="3" class="text-danger text-center">Failed to load data</td></tr>`;
+        console.error(err);
+      })
+      .finally(() => {
+        loader.style.display = "none";
+      });
+
+    searchInput.addEventListener("input", () => {
+      currentPage = 1;
+      renderTable();
+      renderPagination();
+    });
+
+    // Export to PDF button click handler
+    exportBtn.addEventListener("click", async function () {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      const filteredOrders = getFilteredOrders();
+
+      if (filteredOrders.length === 0) {
+        alert("No orders to export!");
+        return;
+      }
+
+      let yPosition = 10;
+      const pageHeight = doc.internal.pageSize.height;
+      loader.style.display = "flex";
+
+      for (let i = 0; i < filteredOrders.length; i++) {
+        const order = filteredOrders[i];
+        doc.setFontSize(14);
+        doc.setTextColor("#A53860");
+        doc.text(order.OrderName, 14, yPosition);
+        yPosition += 10;
+
+        let materials;
+        try {
+          const res = await fetch("https://stocknest-w3r4.onrender.com/api/order-details", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ orderName: order.OrderName }),
+          });
+          materials = await res.json();
+        } catch (error) {
+          materials = [];
+        }
+
+        const tableBody = materials.map(mat => [mat.MaterialName, mat.Quantity.toString()]);
+
+        if (tableBody.length === 0) {
+          doc.setFontSize(12);
+          doc.setTextColor("#333");
+          doc.text("No materials found for this order.", 14, yPosition);
+          yPosition += 10;
+        } else {
+          doc.autoTable({
+            startY: yPosition,
+            head: [["Material Name", "Quantity"]],
+            body: tableBody,
+            margin: { left: 14, right: 14 },
+            theme: "striped",
+            styles: { fontSize: 10 },
+            headStyles: { fillColor: [165, 56, 96] },
+            didDrawPage: (data) => {
+              yPosition = data.cursor.y + 10;
+            }
+          });
+        }
+
+        if (yPosition > pageHeight - 40 && i < filteredOrders.length - 1) {
+          doc.addPage();
+          yPosition = 10;
+        }
+      }
+
+      loader.style.display = "none";
+      doc.save("orders_export.pdf");
+    });
+
+    // Modal material search input
+    modalSearchInput.addEventListener("input", () => {
+      const searchTerm = modalSearchInput.value.toLowerCase();
+      const filteredMaterials = modalData.filter(mat =>
+        mat.MaterialName.toLowerCase().includes(searchTerm)
+      );
+
+      modalTableBody.innerHTML = "";
+      if (filteredMaterials.length === 0) {
+        modalTableBody.innerHTML = `<tr><td colspan="2" class="text-center">No materials found</td></tr>`;
+        return;
+      }
+
+      filteredMaterials.forEach(material => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${material.MaterialName}</td>
+          <td>${material.Quantity}</td>
+        `;
+        modalTableBody.appendChild(row);
+      });
+    });
+  });
+</script>
+</body>
+</html>
